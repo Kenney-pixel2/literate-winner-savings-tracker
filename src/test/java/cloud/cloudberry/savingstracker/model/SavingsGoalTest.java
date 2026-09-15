@@ -18,4 +18,14 @@ class SavingsGoalTest {
         assertEquals(end, goal.getEndDate());
         assertEquals(1200.0, goal.getTargetAmount());
     }
+
+    @Test
+    void remainingAmountIsTargetMinusSaved() {
+        SavingsGoal goal = new SavingsGoal("MacBook",
+                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 1), 1200.0);
+
+        goal.setSavedAmount(300.0);
+
+        assertEquals(900.0, goal.getRemainingAmount());
+    }
 }
