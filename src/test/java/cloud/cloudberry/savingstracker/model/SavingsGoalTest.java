@@ -28,4 +28,24 @@ class SavingsGoalTest {
 
         assertEquals(900.0, goal.getRemainingAmount());
     }
+
+    @Test
+    void remainingDaysCountsFromTodayToEndDateInclusive() {
+        LocalDate today = LocalDate.now();
+        LocalDate end = today.plusDays(10);
+
+        SavingsGoal goal = new SavingsGoal("MacBook", today, end, 1200.0);
+
+        // today counts as a saving day too, so it's 11, not 10
+        assertEquals(11, goal.getRemainingDays());
+    }
+
+    @Test
+    void remainingDaysIsOneWhenEndDateIsToday() {
+        LocalDate today = LocalDate.now();
+
+        SavingsGoal goal = new SavingsGoal("MacBook", today, today, 1200.0);
+
+        assertEquals(1, goal.getRemainingDays());
+    }
 }

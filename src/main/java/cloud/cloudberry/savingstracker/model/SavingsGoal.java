@@ -1,6 +1,7 @@
 package cloud.cloudberry.savingstracker.model;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class SavingsGoal {
 
@@ -40,4 +41,12 @@ public class SavingsGoal {
     public double getRemainingAmount() {
         return targetAmount - savedAmount;
     }    
+
+    public long getRemainingDays() {
+        LocalDate today = LocalDate.now();
+        if (today.isAfter(endDate)) {
+            return 0;
+        }
+        return ChronoUnit.DAYS.between(today, endDate) + 1; // +1 so today counts as a saving day
+    }
 }
