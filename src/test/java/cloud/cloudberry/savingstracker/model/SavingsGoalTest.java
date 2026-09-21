@@ -48,4 +48,37 @@ class SavingsGoalTest {
 
         assertEquals(1, goal.getRemainingDays());
     }
+
+    @Test
+    void dailyAmountSplitsRemainingAcrossRemainingDays() {
+        LocalDate today = LocalDate.now();
+        LocalDate end = today.plusDays(9); // 10 remaining days, counting today
+
+        SavingsGoal goal = new SavingsGoal("MacBook", today, end, 1000.0);
+        goal.setSavedAmount(0.0);
+
+        assertEquals(100.0, goal.getDailyAmountToSave());
+    }
+
+    @Test
+    void dailyAmountIsWholeRemainingWhenEndDateIsToday() {
+        LocalDate today = LocalDate.now();
+
+        SavingsGoal goal = new SavingsGoal("MacBook", today, today, 500.0);
+        goal.setSavedAmount(200.0);
+
+        // only 1 day left, so the whole remaining balance is due today
+        assertEquals(300.0, goal.getDailyAmountToSave());
+    }
+
+    @Test
+    void dailyAmountIsZeroWhenTargetAlreadyReached() {
+        LocalDate today = LocalDate.now();
+        LocalDate end = today.plusDays(10);
+
+        SavingsGoal goal = new SavingsGoal("MacBook", today, end, 1000.0);
+        goal.setSavedAmount(1000.0);
+
+        assertEquals(0.0, goal.getDailyAmountToSave());
+    }
 }

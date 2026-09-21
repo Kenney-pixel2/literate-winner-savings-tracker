@@ -49,4 +49,13 @@ public class SavingsGoal {
         }
         return ChronoUnit.DAYS.between(today, endDate) + 1; // +1 so today counts as a saving day
     }
+
+    public double getDailyAmountToSave() {
+        double remaining = getRemainingAmount();
+        if (remaining <= 0) {
+            return 0.0;
+        }
+        long days = getRemainingDays();
+        return remaining / days;
+    }
 }
