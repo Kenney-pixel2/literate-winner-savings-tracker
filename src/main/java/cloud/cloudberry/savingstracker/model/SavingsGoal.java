@@ -58,4 +58,17 @@ public class SavingsGoal {
         long days = getRemainingDays();
         return remaining / days;
     }
+
+        public double getProgressPercent() {
+        double percent = (savedAmount / targetAmount) * 100.0;
+        return Math.min(percent, 100.0);
+    }
+
+    public boolean isComplete() {
+        return savedAmount >= targetAmount;
+    }
+
+    public boolean isOverdue() {
+        return LocalDate.now().isAfter(endDate) && !isComplete();
+    }
 }

@@ -3,6 +3,8 @@ package cloud.cloudberry.savingstracker.model;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class SavingsGoalTest {
 
@@ -80,5 +82,50 @@ class SavingsGoalTest {
         goal.setSavedAmount(1000.0);
 
         assertEquals(0.0, goal.getDailyAmountToSave());
+    }
+
+    @Test
+    void progressPercentIsSavedOverTarget() {
+        SavingsGoal goal = new SavingsGoal("MacBook",
+                LocalDate.now(), LocalDate.now().plusDays(10), 1000.0);
+        goal.setSavedAmount(250.0);
+
+        assertEquals(25.0, goal.getProgressPercent());
+    }
+
+    @Test
+    void progressPercentIsCappedAtOneHundred() {
+        SavingsGoal goal = new SavingsGoal("MacBook",
+                LocalDate.now(), LocalDate.now().plusDays(10), 1000.0);
+        goal.setSavedAmount(1500.0); // saved more than the target
+
+        assertEquals(100.0, goal.getProgressPercent());
+    }
+
+    @Test
+    void isCompleteWhenSavedMeetsOrExceedsTarget() {
+        SavingsGoal goal = new SavingsGoal("MacBook",
+                LocalDate.now(), LocalDate.now().plusDays(10), 1000.0);
+        goal.setSavedAmount(1000.0);
+
+        assertTrue(goal.isComplete());
+    }
+
+    @Test
+    void isNotCompleteWhenSavedIsBelowTarget() {
+        SavingsGoal goal = new SavingsGoal("MacBook",
+                LocalDate.now(), LocalDate.now().plusDays(10), 1000.0);
+        goal.setSavedAmount(999.0);
+
+        assertFalse(goal.isComplete());
+    }
+
+    @Test
+    void isOverdueWhenEndDateIsPastAndNotComplete() {
+        SavingsGoal goal = new SavingsGoal("MacBook",
+                LocalDate.now().minusDays(10), LocalDate.now().minusDays(1), 1000.0);
+        goal.setSavedAmount(500.0); // not complete, and end date already passed
+
+        assertTrue(goal.isOverdue());
     }
 }
