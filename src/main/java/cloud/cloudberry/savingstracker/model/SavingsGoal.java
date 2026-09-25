@@ -34,6 +34,10 @@ public class SavingsGoal {
         return targetAmount;
     }
     
+    public double getSavedAmount() {
+        return savedAmount;
+    }
+
     public void setSavedAmount(double savedAmount) {
         this.savedAmount = savedAmount;
     }
