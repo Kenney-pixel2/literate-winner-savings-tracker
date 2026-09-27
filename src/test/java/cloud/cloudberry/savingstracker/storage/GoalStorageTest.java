@@ -5,10 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GoalStorageTest {
 
@@ -16,21 +20,50 @@ class GoalStorageTest {
     Path tempDir;
 
     @Test
-    void savingAndLoadingAGoalPreservesItsFields() throws IOException {
+    void savingAndLoadingMultipleGoalsPreservesAllFields() throws IOException {
         Path file = tempDir.resolve("goals.dat");
         GoalStorage storage = new GoalStorage(file);
 
-        SavingsGoal original = new SavingsGoal("MacBook",
+        SavingsGoal macbook = new SavingsGoal("MacBook",
                 LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 1), 1200.0);
-        original.setSavedAmount(300.0);
+        macbook.setSavedAmount(300.0);
 
-        storage.save(original);
-        SavingsGoal loaded = storage.load();
+        SavingsGoal vacation = new SavingsGoal("Vacation",
+                LocalDate.of(2026, 2, 1), LocalDate.of(2026, 12, 1), 2000.0);
+        vacation.setSavedAmount(500.0);
 
-        assertEquals("MacBook", loaded.getName());
-        assertEquals(LocalDate.of(2026, 1, 1), loaded.getStartDate());
-        assertEquals(LocalDate.of(2026, 6, 1), loaded.getEndDate());
-        assertEquals(1200.0, loaded.getTargetAmount());
-        assertEquals(300.0, loaded.getSavedAmount());
+        List<SavingsGoal> goals = new ArrayList<>();
+        goals.add(macbook);
+        goals.add(vacation);
+
+        storage.saveAll(goals);
+        List<SavingsGoal> loaded = storage.loadAll();
+
+        assertEquals(2, loaded.size());
+        assertEquals("MacBook", loaded.get(0).getName());
+        assertEquals(300.0, loaded.get(0).getSavedAmount());
+        assertEquals("Vacation", loaded.get(1).getName());
+        assertEquals(2000.0, loaded.get(1).getTargetAmount());
+    }
+
+    @Test
+    void loadingFromMissingFileReturnsEmptyList() throws IOException {
+        Path file = tempDir.resolve("does-not-exist.dat");
+        GoalStorage storage = new GoalStorage(file);
+
+        List<SavingsGoal> loaded = storage.loadAll();
+
+        assertTrue(loaded.isEmpty());
+    }
+
+    @Test
+    void loadingFromEmptyFileReturnsEmptyList() throws IOException {
+        Path file = tempDir.resolve("empty.dat");
+        Files.writeString(file, "");
+        GoalStorage storage = new GoalStorage(file);
+
+        List<SavingsGoal> loaded = storage.loadAll();
+
+        assertTrue(loaded.isEmpty());
     }
 }

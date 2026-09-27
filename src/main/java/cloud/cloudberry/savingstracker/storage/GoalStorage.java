@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GoalStorage {
 
@@ -15,18 +17,41 @@ public class GoalStorage {
         this.filePath = filePath;
     }
 
-    public void save(SavingsGoal goal) throws IOException {
-        String line = String.join("|",
+    public void saveAll(List<SavingsGoal> goals) throws IOException {
+        List<String> lines = new ArrayList<>();
+        for (SavingsGoal goal : goals) {
+            lines.add(toLine(goal));
+        }
+        Files.write(filePath, lines);
+    }
+
+    public List<SavingsGoal> loadAll() throws IOException {
+        List<SavingsGoal> goals = new ArrayList<>();
+
+        if (!Files.exists(filePath)) {
+            return goals;
+        }
+
+        List<String> lines = Files.readAllLines(filePath);
+        for (String line : lines) {
+            if (line.isBlank()) {
+                continue;
+            }
+            goals.add(fromLine(line));
+        }
+        return goals;
+    }
+
+    private String toLine(SavingsGoal goal) {
+        return String.join("|",
                 goal.getName(),
                 goal.getStartDate().toString(),
                 goal.getEndDate().toString(),
                 String.valueOf(goal.getTargetAmount()),
                 String.valueOf(goal.getSavedAmount()));
-        Files.writeString(filePath, line);
     }
 
-    public SavingsGoal load() throws IOException {
-        String line = Files.readString(filePath);
+    private SavingsGoal fromLine(String line) {
         String[] parts = line.split("\\|");
 
         String name = parts[0];
