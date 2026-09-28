@@ -66,4 +66,36 @@ class GoalStorageTest {
 
         assertTrue(loaded.isEmpty());
     }
+
+    
+    private SavingsGoal roundTrip(String name) throws IOException {
+        Path file = tempDir.resolve("goals.dat");
+        GoalStorage storage = new GoalStorage(file);
+
+        SavingsGoal goal = new SavingsGoal(name,
+                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 1), 1200.0);
+        storage.saveAll(List.of(goal));
+
+        return storage.loadAll().get(0);
+    }
+
+    @Test
+    void nameContainingPipeSurvivesRoundTrip() throws IOException {
+        assertEquals("Cash | Savings", roundTrip("Cash | Savings").getName());
+    }
+
+    @Test
+    void nameContainingBackslashSurvivesRoundTrip() throws IOException {
+        assertEquals("C:\\temp\\new", roundTrip("C:\\temp\\new").getName());
+    }
+
+    @Test
+    void nameContainingNewlineSurvivesRoundTrip() throws IOException {
+        assertEquals("Line one\nLine two", roundTrip("Line one\nLine two").getName());
+    }
+
+    @Test
+    void nameWithBackslashRightBeforePipeSurvivesRoundTrip() throws IOException {
+        assertEquals("a\\|b", roundTrip("a\\|b").getName());
+    }
 }

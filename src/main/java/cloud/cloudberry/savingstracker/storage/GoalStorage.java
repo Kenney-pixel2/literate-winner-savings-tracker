@@ -44,7 +44,7 @@ public class GoalStorage {
 
     private String toLine(SavingsGoal goal) {
         return String.join("|",
-                goal.getName(),
+                escape(goal.getName()),
                 goal.getStartDate().toString(),
                 goal.getEndDate().toString(),
                 String.valueOf(goal.getTargetAmount()),
@@ -52,16 +52,56 @@ public class GoalStorage {
     }
 
     private SavingsGoal fromLine(String line) {
-        String[] parts = line.split("\\|");
+        List<String> parts = splitFields(line);
 
-        String name = parts[0];
-        LocalDate startDate = LocalDate.parse(parts[1]);
-        LocalDate endDate = LocalDate.parse(parts[2]);
-        double targetAmount = Double.parseDouble(parts[3]);
-        double savedAmount = Double.parseDouble(parts[4]);
+        String name = parts.get(0);
+        LocalDate startDate = LocalDate.parse(parts.get(1));
+        LocalDate endDate = LocalDate.parse(parts.get(2));
+        double targetAmount = Double.parseDouble(parts.get(3));
+        double savedAmount = Double.parseDouble(parts.get(4));
 
         SavingsGoal goal = new SavingsGoal(name, startDate, endDate, targetAmount);
         goal.setSavedAmount(savedAmount);
         return goal;
+    }
+
+    private static String escape(String text) {
+        StringBuilder result = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            switch (c) {
+                case '\\':
+                    result.append("\\\\");
+                    break;
+                case '|':
+                    result.append("\\|");
+                    break;
+                case '\n':
+                    result.append("\\n");
+                    break;
+                default:
+                    result.append(c);
+            }
+        }
+        return result.toString();
+    }
+
+    private static List<String> splitFields(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '\\' && i + 1 < line.length()) {
+                char next = line.charAt(++i);
+                current.append(next == 'n' ? '\n' : next);
+            } else if (c == '|') {
+                fields.add(current.toString());
+                current.setLength(0);
+            } else {
+                current.append(c);
+            }
+        }
+        fields.add(current.toString());
+        return fields;
     }
 }
