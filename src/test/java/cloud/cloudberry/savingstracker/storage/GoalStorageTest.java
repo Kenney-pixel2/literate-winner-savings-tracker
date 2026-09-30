@@ -21,8 +21,7 @@ class GoalStorageTest {
 
     @Test
     void savingAndLoadingMultipleGoalsPreservesAllFields() throws IOException {
-        Path file = tempDir.resolve("goals.dat");
-        GoalStorage storage = new GoalStorage(file);
+        GoalStorage storage = newStorage("goals.dat");
 
         SavingsGoal macbook = new SavingsGoal("MacBook",
                 LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 1), 1200.0);
@@ -48,8 +47,7 @@ class GoalStorageTest {
 
     @Test
     void loadingFromMissingFileReturnsEmptyList() throws IOException {
-        Path file = tempDir.resolve("does-not-exist.dat");
-        GoalStorage storage = new GoalStorage(file);
+        GoalStorage storage = newStorage("does-not-exist.dat");
 
         List<SavingsGoal> loaded = storage.loadAll();
 
@@ -58,25 +56,12 @@ class GoalStorageTest {
 
     @Test
     void loadingFromEmptyFileReturnsEmptyList() throws IOException {
-        Path file = tempDir.resolve("empty.dat");
-        Files.writeString(file, "");
-        GoalStorage storage = new GoalStorage(file);
+        Files.writeString(tempDir.resolve("empty.dat"), "");
+        GoalStorage storage = newStorage("empty.dat");
 
         List<SavingsGoal> loaded = storage.loadAll();
 
         assertTrue(loaded.isEmpty());
-    }
-
-    
-    private SavingsGoal roundTrip(String name) throws IOException {
-        Path file = tempDir.resolve("goals.dat");
-        GoalStorage storage = new GoalStorage(file);
-
-        SavingsGoal goal = new SavingsGoal(name,
-                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 1), 1200.0);
-        storage.saveAll(List.of(goal));
-
-        return storage.loadAll().get(0);
     }
 
     @Test
@@ -97,5 +82,19 @@ class GoalStorageTest {
     @Test
     void nameWithBackslashRightBeforePipeSurvivesRoundTrip() throws IOException {
         assertEquals("a\\|b", roundTrip("a\\|b").getName());
+    }
+
+    private GoalStorage newStorage(String filename) {
+        return new GoalStorage(tempDir.resolve(filename));
+    }
+
+    private SavingsGoal roundTrip(String name) throws IOException {
+        GoalStorage storage = newStorage("goals.dat");
+
+        SavingsGoal goal = new SavingsGoal(name,
+                LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 1), 1200.0);
+        storage.saveAll(List.of(goal));
+
+        return storage.loadAll().get(0);
     }
 }
