@@ -75,4 +75,10 @@ public class SavingsGoal {
     public boolean isOverdue() {
         return LocalDate.now().isAfter(endDate) && !isComplete();
     }
+
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

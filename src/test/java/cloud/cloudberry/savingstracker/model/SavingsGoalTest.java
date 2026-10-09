@@ -108,4 +108,12 @@ class SavingsGoalTest {
         goal.setSavedAmount(saved);
         return goal;
     }
+
+
+    @Test
+    void toStringIsTheGoalName() {
+        SavingsGoal goal = goalWith(LocalDate.now(), LocalDate.now().plusDays(10), 1000.0, 0.0);
+
+        assertEquals("MacBook", goal.toString());
+    }
 }
