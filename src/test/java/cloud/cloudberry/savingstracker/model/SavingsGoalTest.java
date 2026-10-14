@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SavingsGoalTest {
 
@@ -115,5 +116,25 @@ class SavingsGoalTest {
         SavingsGoal goal = goalWith(LocalDate.now(), LocalDate.now().plusDays(10), 1000.0, 0.0);
 
         assertEquals("MacBook", goal.toString());
+    }
+
+
+    @Test
+    void addToSavedIncreasesSavedAmount() {
+        SavingsGoal goal = goalWith(LocalDate.now(), LocalDate.now().plusDays(10), 1000.0, 100.0);
+
+        goal.addToSaved(50.0);
+
+        assertEquals(150.0, goal.getSavedAmount());
+    }
+
+
+    @Test
+    void addToSavedRejectsZeroAndNegativeAmounts() {
+        SavingsGoal goal = goalWith(LocalDate.now(), LocalDate.now().plusDays(10), 1000.0, 100.0);
+
+        assertThrows(IllegalArgumentException.class, () -> goal.addToSaved(0.0));
+        assertThrows(IllegalArgumentException.class, () -> goal.addToSaved(-500.0));
+        assertEquals(100.0, goal.getSavedAmount());
     }
 }

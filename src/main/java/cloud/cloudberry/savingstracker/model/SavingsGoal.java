@@ -38,6 +38,13 @@ public class SavingsGoal {
         return savedAmount;
     }
 
+    public void addToSaved(double amount) {
+        if (!(amount > 0) || Double.isInfinite(amount)) {
+            throw new IllegalArgumentException("The amount must be more than zero.");
+        }
+        savedAmount += amount;
+    }
+
     public void setSavedAmount(double savedAmount) {
         this.savedAmount = savedAmount;
     }
