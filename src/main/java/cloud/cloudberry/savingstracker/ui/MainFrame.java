@@ -17,6 +17,7 @@ public class MainFrame extends JFrame {
     private final DefaultListModel<SavingsGoal> listModel = new DefaultListModel<>();
     private final JList<SavingsGoal> goalList = new JList<>(listModel);
     private final JButton editButton = new JButton("Edit goal");
+    private final JButton savingsButton = new JButton("Add savings");
 
     public MainFrame() {
         super("Savings Tracker");
@@ -32,12 +33,20 @@ public class MainFrame extends JFrame {
         addButton.addActionListener(e -> onAdd());
         editButton.addActionListener(e -> onEdit());
         editButton.setEnabled(false);
-        goalList.addListSelectionListener(e ->
-                editButton.setEnabled(goalList.getSelectedIndex() >= 0));
+        
+        savingsButton.addActionListener(e -> onAddSavings());
+        savingsButton.setEnabled(false);
+        goalList.addListSelectionListener(e -> {
+            boolean selected = goalList.getSelectedIndex() >= 0;
+            editButton.setEnabled(selected);
+            savingsButton.setEnabled(selected);
+        });
+
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttons.add(addButton);
         buttons.add(editButton);
+        buttons.add(savingsButton);
 
         add(new JScrollPane(goalList), BorderLayout.CENTER);
         add(buttons, BorderLayout.SOUTH);
@@ -52,6 +61,14 @@ public class MainFrame extends JFrame {
             goalList.setSelectedIndex(listModel.size() - 1);
             saveGoals();
         }
+    }
+
+    private void onAddSavings() {
+        int index = goalList.getSelectedIndex();
+        if (index < 0) {
+            return;
+        }
+        AddSavingsDialog.show(this, listModel.get(index));
     }
 
     private void onEdit() {
