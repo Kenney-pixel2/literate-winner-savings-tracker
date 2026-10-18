@@ -7,9 +7,17 @@ import java.awt.*;
 
 public class AddSavingsDialog extends JDialog {
 
+    private final JTextField amountField = new JTextField(12);
+
     private AddSavingsDialog(Frame owner, SavingsGoal goal) {
         super(owner, "Add savings to " + goal.getName(), true);
-        setSize(320, 160);
+
+        JPanel form = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 16));
+        form.add(new JLabel("Amount saved"));
+        form.add(amountField);
+        add(form, BorderLayout.CENTER);
+        pack();
+        
         setLocationRelativeTo(owner);
     }
 
